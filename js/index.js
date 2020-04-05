@@ -1,12 +1,33 @@
 /*
-
 API KEY : AIzaSyAM337uNye7v5t-HkV8ZWopbLo8XsxWt10
-
 */
-const API_KEY = "AIzaSyAM337uNye7v5t-HkV8ZWopbLo8XsxWt10";
 
+const API_KEY = "AIzaSyAM337uNye7v5t-HkV8ZWopbLo8XsxWt10";
+let nextPage;
+let prevPage;
+let pageNum = 0;
+
+/*
+for the seccond fetch attribute
+  0 is the initial page
+  1 is the next page
+  -1 is the prev page
+*/
 function fetchVideos(searchTerm, command) {
-  let url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&q=${searchTerm}&type=video&part=snippet&maxResults=10`;
+
+  let url = ""
+  if(command == 0){
+    url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&q=${searchTerm}&type=video&part=snippet&maxResults=10`;
+  }
+  else if (command == 1){
+    url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&q=${searchTerm}&type=video&part=snippet&maxResults=10&pageToken=${nextPage}`;
+    pageNum += 1
+  }
+  
+  else if (command == -1){
+    url = `https://www.googleapis.com/youtube/v3/search?key=${API_KEY}&q=${searchTerm}&type=video&part=snippet&maxResults=10&pageToken=${prevPage}`;
+    pageNum -= 1
+  }
 
   let settings = {
     method: 'GET'
@@ -49,6 +70,11 @@ function displayResults(data) {
           </div>
       `;
   }
+  nextPage = data.nextPageToken;
+
+	if(pageNum > 1) {
+		prevPage = data.prevPageToken;
+    }
 }
 
 function watchForm() {
@@ -56,19 +82,19 @@ function watchForm() {
   let previousButtton = document.querySelector('.previousButtton');
   let nextButtton = document.querySelector('.nextButtton');
 
-  
-  let command = 0;
 
   /* 
-  command = 0 is the initial page
-  command = 1 is the next page
-  command = -1 is the prev page
+  for the seccond fetch attribute
+    0 is the initial page
+    1 is the next page
+    -1 is the prev page
   */
 
   submitButtton.addEventListener('click', (event) => {
     event.preventDefault();
     let searchTerm = document.querySelector('#searchTerm').value;
     fetchVideos(searchTerm, 0);
+    pageNum = 1;
 
   });
 
